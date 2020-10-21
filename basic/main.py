@@ -5,7 +5,7 @@ capacities = {} # capacities of rooms. e.g: room at index 0 has capacity 84
 teacher_class = [] # the class number that each teacher teaches. e.g: teacher at index 0 teaches class no.5
 
 text_file = open("demo_constraints.txt", "r")
-class_time = text_file.readline()
+class_time = int(text_file.readline().split("\t")[1])
 rooms_num = int(text_file.readline().split("\t")[1])
 for i in range(rooms_num):
     line = text_file.readline().split("\t")
@@ -85,6 +85,33 @@ for n in range(1,teacher_num+1):
     classConflicts[a-1][b-1]=math.inf
     classConflicts[b-1][a-1]=math.inf
 
+#now, creating list of tuples that contain (class1,class2,conflictscore)
+conflictList = []
+for i in range(len(classConflicts)):
+    for j in range(0,i):
+        c = (i+1,j+1, classConflicts[i][j])
+        conflictList.append(c)
+print("unsorted conflict list: ",conflictList)
+conflictList.sort(reverse=True, key = lambda t: t[2])
+print("sorted conflict list: ",conflictList)
+
+timeslot = []*class_time
+
+for conflict in conflictList:
+    classes = [conflict[0],conflict[1]]
+    for c in classes:
+        if not classScheduled[c-1]:
+            scores = [0]*class_time
+            for t in range(class_time):
+                for d in timeslot[t-1]:
+                    scores[t] += classConflicts[d,c]
+            slot_score = min(scores)
+            slot_id = scores.index(slot_score)
+            timeslot[slot_id].append(c)
+            classScheduled[c-1]=True
+
+
+print("class time: ",class_time)
 print("class conflicts:",classConflicts)
     #any other conflict weighting can be done here
 
