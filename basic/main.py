@@ -12,7 +12,7 @@ for i in range(rooms_num):
     capacities[int(line[0])] = int(line[1])
 
 capacities = sorted(capacities.items(), key=operator.itemgetter(1)) # a list of tuples. format: (room number, capacity)
-print(capacities)
+#print(capacities)
 
 
 class_num = int(text_file.readline().split("\t")[1]) # total number of classes
@@ -39,8 +39,8 @@ for i in range(student_num):
 #eventually revise these values
 
 #teachersAvailible is removed with a ranking in classConflicts
-print("Class Num: ",class_num)
-print("teacher_class: ",teacher_class)
+#print("Class Num: ",class_num)
+#print("teacher_class: ",teacher_class)
 
 classPopularity = [0] * class_num
 classScheduled = [False] * class_num
@@ -78,7 +78,7 @@ for p in student_prefs:
 
 for n in range(1,teacher_num+1):
     indicies = [i for i, x in enumerate(teacher_class) if x==n]
-    print(indicies)
+    #print(indicies)
     #note that these lines assume the teacher is only teaching 2 classes
     a=indicies[0]
     b=indicies[1]
@@ -91,28 +91,60 @@ for i in range(len(classConflicts)):
     for j in range(0,i):
         c = (i+1,j+1, classConflicts[i][j])
         conflictList.append(c)
-print("unsorted conflict list: ",conflictList)
+#print("unsorted conflict list: ",conflictList)
 conflictList.sort(reverse=True, key = lambda t: t[2])
-print("sorted conflict list: ",conflictList)
+#print("sorted conflict list: ",conflictList)
 
-timeslot = []*class_time
-
+timeslot = [[] for _ in range(class_time)] #this syntax is terrible...
+roomSchedules = [[-1]*rooms_num for _ in range(class_time)] #in this case, call roomSchedules[time][roomID-1]
+maxRoom = [capacities[-1][1]]*class_time #this will take the largest-capacity room still availible in each timeslot
 for conflict in conflictList:
     classes = [conflict[0],conflict[1]]
     for c in classes:
-        if not classScheduled[c-1]:
+        if classScheduled[c-1]==False:
             scores = [0]*class_time
             for t in range(class_time):
-                for d in timeslot[t-1]:
-                    scores[t] += classConflicts[d,c]
+                for d in timeslot[t]:
+                    #it is possible that more students will be able to take the class then can fit in the largest availible room.
+                    roomRestriction = classPopularity[c-1] - maxRoom[t]
+                    #if the room is smaller than the class, this will be some positive number.
+                    scores[t] += max(classConflicts[d][c-1],roomRestriction)
+            
             slot_score = min(scores)
+            #slot_id is the selected timeslot
             slot_id = scores.index(slot_score)
-            timeslot[slot_id].append(c)
+            timeslot[slot_id].append(c-1)
             classScheduled[c-1]=True
+            #need to find classroom
+            best_room = -1
+            room_cap = -1
+            for r in range(rooms_num):
+                r=rooms_num - 1 - r
+                if(roomSchedules[slot_id][r] == -1 and room_cap < capacities[r][1]): #if room capacity is larger than current room's, and that room is availible
+                    best_room = capacities[r][0]
+                    room_cap = capacities[r][1]
+                    #if room is big enough, stop.
+                    if(room_cap >= classPopularity[c-1]):
+                        break
+                   
+            #now the best room has been found
+            #schedule room
+            if best_room != -1:
+                print("timeslot: ",slot_id,"| best room: ",best_room)
+                roomSchedules[slot_id][best_room-1] = c
 
+            if room_cap == maxRoom[slot_id]:
+                #there is a smaller maxRoom
+                newMaxRoom = -1
+                for i in range(len(roomSchedules[slot_id])):
+                    if roomSchedules[slot_id][i] == -1 and capacities[i][1] > newMaxRoom:
+                        newMaxRoom = capacities[i][1]
+                maxRoom[slot_id] = newMaxRoom
+            print("roomSchedules: ",roomSchedules)
 
-print("class time: ",class_time)
-print("class conflicts:",classConflicts)
+print("timeslots: ",timeslot)
+#print("class time: ",class_time)
+#print("class conflicts:",classConflicts)
     #any other conflict weighting can be done here
 
     #now, each pair of classes must be ranked in decreasing order of conflict
