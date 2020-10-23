@@ -75,15 +75,14 @@ for p in student_prefs:
 #    print("teacher conflicts with classes a=",a,", b=",b)
 #    teacherConflicts[a-1][b-1]+=math.inf
 #    teacherConflicts[b-1][a-1]+=math.inf
-
 for n in range(1,teacher_num+1):
     indicies = [i for i, x in enumerate(teacher_class) if x==n]
-    #print(indicies)
+    print(indicies)
     #note that these lines assume the teacher is only teaching 2 classes
     a=indicies[0]
     b=indicies[1]
-    classConflicts[a-1][b-1]=math.inf
-    classConflicts[b-1][a-1]=math.inf
+    classConflicts[a][b]=math.inf
+    classConflicts[b][a]=math.inf
 
 #now, creating list of tuples that contain (class1,class2,conflictscore)
 conflictList = []
