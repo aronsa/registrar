@@ -1,5 +1,4 @@
 import math
-import operator
 
 capacities = [] # capacities of rooms. e.g: room at index 0 has capacity 84
 teacher_class = [] # the class number that each teacher teaches. e.g: teacher at index 0 teaches class no.5
@@ -114,8 +113,32 @@ for conflict in conflictList:
                         newMaxRoom = capacities[i][1]
                 maxRoom[slot_id] = newMaxRoom
 
-print("roomSchedules: ",roomSchedules)
-print("timeslots: ",timeslot)
-    #any other conflict weighting can be done here
+# print("roomSchedules: ",roomSchedules)
+# print("timeslots: ",timeslot)
+#any other conflict weighting can be done here
 
-    #now, each pair of classes must be ranked in decreasing order of conflict
+#now, each pair of classes must be ranked in decreasing order of conflict
+class_rooms = []
+class_times = []
+
+for i in range(class_num+1):
+    for j in range(len(roomSchedules)):
+        if i in roomSchedules[j]:
+            class_rooms.append(roomSchedules[j].index(i) + 1)
+            class_times.append(j+1)
+
+# print(class_rooms)
+# print(class_times)
+
+enrollment = [[] for _ in range (class_num)]
+for p in range(len(student_prefs)):
+    studentAvailable = [True] * class_time
+
+    for c in student_prefs[p]:
+        capacities[class_rooms[c-1]-1]
+        studentAvailable[class_times[c-1]-1]
+        if len(enrollment[c-1]) < capacities[class_rooms[c-1]-1][1] and studentAvailable[class_times[c-1]-1]:
+            enrollment[c-1].append(p+1)
+            studentAvailable[class_times[c-1]-1] = False
+
+# print(enrollment)
