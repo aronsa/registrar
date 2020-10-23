@@ -12,14 +12,11 @@ for i in range(rooms_num):
     capacities.append((int(line[0]), int(line[1])))
 
 capacities.sort(key = lambda x: x[1]) # a list of tuples. format: (room number, capacity)
-#print(capacities)
-
 
 class_num = int(text_file.readline().split("\t")[1]) # total number of classes
 teacher_num = int(text_file.readline().split("\t")[1]) # total number of teachers
 for i in range(class_num):
     teacher_class.append(int(text_file.readline().split("\t")[1]))
-
 
 student_prefs = [] # a list of list that contains student preferences
 
@@ -31,16 +28,11 @@ for i in range(student_num):
         prefs[index] = int(prefs[index])
     student_prefs.append(prefs)
 
-print(class_time)
-
-
 
 #main portion of code
 #eventually revise these values
 
 #teachersAvailible is removed with a ranking in classConflicts
-#print("Class Num: ",class_num)
-#print("teacher_class: ",teacher_class)
 
 classPopularity = [0] * class_num
 classScheduled = [False] * class_num
@@ -50,9 +42,7 @@ classConflicts = [[0]*class_num for _ in range(class_num)]
 
 for p in student_prefs:
     #p is a list, containing all of the classes that this student would like to take
-#    print(p)
     for c in p:
-#        print(c)
         classPopularity[c-1]+=1
 
   #student conflicts
@@ -60,24 +50,13 @@ for p in student_prefs:
         for j in range (i,len(p)):
             a = p[i]
             b = p[j]
-#            print("a: ",a)
-#            print("b: ",b)
-#            print("class Conflicts: ",classConflicts)
-#            print("len: ",len(classConflicts))
             classConflicts[a-1][b-1]+=1
             classConflicts[b-1][a-1]+=1
 
         #teacher conflicts
         #need to find all of the classes that a given teacher is teaching
-#while len(teacher_class)>0:
-#    a = teacher_class.pop()
-#    b = teacher_class.pop(teacher_class.index(a))
-#    print("teacher conflicts with classes a=",a,", b=",b)
-#    teacherConflicts[a-1][b-1]+=math.inf
-#    teacherConflicts[b-1][a-1]+=math.inf
 for n in range(1,teacher_num+1):
     indicies = [i for i, x in enumerate(teacher_class) if x==n]
-    print(indicies)
     #note that these lines assume the teacher is only teaching 2 classes
     a=indicies[0]
     b=indicies[1]
@@ -90,13 +69,10 @@ for i in range(len(classConflicts)):
     for j in range(0,i):
         c = (i+1,j+1, classConflicts[i][j])
         conflictList.append(c)
-#print("unsorted conflict list: ",conflictList)
 conflictList.sort(reverse=True, key = lambda t: t[2])
-# print("sorted conflict list: ",conflictList)
 
 timeslot = [[] for _ in range(class_time)] #this syntax is terrible...
 roomSchedules = [[-1]*rooms_num for _ in range(class_time)] #in this case, call roomSchedules[time][roomID-1]
-print(roomSchedules)
 maxRoom = [capacities[-1][1]]*class_time #this will take the largest-capacity room still availible in each timeslot
 for conflict in conflictList:
     classes = [conflict[0],conflict[1]]
@@ -119,34 +95,15 @@ for conflict in conflictList:
             best_room = -1
             room_cap = -1
             r = 0
-#             for r in range(rooms_num):
-#                 # r-=1
-#                 # print("r", r)
-#                 done=False
-#                 #r=rooms_num - 1 - r
-#                 # print("roomschedule: ", roomSchedules[slot_id][r])
-#                 if(roomSchedules[slot_id][r] == -1 and room_cap < capacities[r][1] and not done): #if room capacity is larger than current room's, and that room is availible
-# #                    print("inif?", roomSchedules[slot_id][r])
-#                     print("capacities: ", capacities[r])
-#                     best_room = capacities[r][0]
-#                     room_cap = capacities[r][1]
-#                     #if room is big enough, stop.
-#                     # print("Best room: ", best_room, ", Room cap: ", room_cap)
-#                     if(room_cap >= classPopularity[c-1]):
-#                         # print("ENTER")
-#                         done=True
             while room_cap < classPopularity[c-1] and r < rooms_num:
                 if roomSchedules[slot_id][r] == -1:
                     best_room = r
                     room_cap = capacities[r][1]
                 r += 1
 
-
-            print("best room: ",best_room)
             #now the best room has been found
             #schedule room
             if best_room != -1:
-                print("timeslot: ",slot_id,"| best room: ",best_room)
                 roomSchedules[slot_id][best_room] = c
 
             if room_cap == maxRoom[slot_id]:
@@ -156,11 +113,9 @@ for conflict in conflictList:
                     if roomSchedules[slot_id][i] == -1 and capacities[i][1] > newMaxRoom:
                         newMaxRoom = capacities[i][1]
                 maxRoom[slot_id] = newMaxRoom
-            print("roomSchedules: ",roomSchedules)
 
+print("roomSchedules: ",roomSchedules)
 print("timeslots: ",timeslot)
-#print("class time: ",class_time)
-#print("class conflicts:",classConflicts)
     #any other conflict weighting can be done here
 
     #now, each pair of classes must be ranked in decreasing order of conflict
