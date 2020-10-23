@@ -27,6 +27,7 @@ for i in range(student_num):
         prefs[index] = int(prefs[index])
     student_prefs.append(prefs)
 
+text_file.close()
 
 #main portion of code
 #eventually revise these values
@@ -142,3 +143,14 @@ for p in range(len(student_prefs)):
             studentAvailable[class_times[c-1]-1] = False
 
 # print(enrollment)
+
+output_file = open("schedule.txt", "w")
+output_file.write("Course\tRoom\tTeacher\tTime\tStudents\n")
+for c in range(class_num):
+    student_list = ""
+    for s in enrollment[c]:
+        new_student = str(s)+" "
+        student_list += new_student
+    output_file.write(str(c+1) + "\t" + str(class_rooms[c]) + "\t" + str(teacher_class[c]) + "\t" + str(class_times[c]) + "\t" + student_list + "\n")
+
+output_file.close()
