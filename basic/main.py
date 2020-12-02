@@ -74,6 +74,10 @@ conflictList.sort(reverse=True, key = lambda t: t[2])
 timeslot = [[] for _ in range(class_time)] #this syntax is terrible...
 roomSchedules = [[-1]*rooms_num for _ in range(class_time)] #in this case, call roomSchedules[time][roomID-1]
 maxRoom = [capacities[-1][1]]*class_time #this will take the largest-capacity room still availible in each timeslot
+class_rooms = [-1]*class_num
+class_times = [-1]*class_num
+class_cap = [-1]*class_num
+
 for conflict in conflictList:
     classes = [conflict[0],conflict[1]]
     for c in classes:
@@ -105,7 +109,9 @@ for conflict in conflictList:
             #schedule room
             if best_room != -1:
                 roomSchedules[slot_id][best_room] = c
-
+                class_rooms[c-1] = capacities[best_room][0]
+                class_times[c-1] = slot_id
+                class_cap[c-1]= capacities[best_room][1]
             if room_cap == maxRoom[slot_id]:
                 #there is a smaller maxRoom
                 newMaxRoom = -1
@@ -119,38 +125,50 @@ for conflict in conflictList:
 #any other conflict weighting can be done here
 
 #now, each pair of classes must be ranked in decreasing order of conflict
-class_rooms = []
-class_times = []
-
-for i in range(class_num+1):
-    for j in range(len(roomSchedules)):
-        if i in roomSchedules[j]:
-            class_rooms.append(roomSchedules[j].index(i) + 1)
-            class_times.append(j+1)
+#for t in range(len(roomSchedules)):
+#    print("======")
+#    for i in range(len(roomSchedules[t])):
+#            if(roomSchedules[t][i] != -1):
+#                course = roomSchedules[t][i]-1
+#                class_rooms[course] = i+1 #id+1
+#                print("assigned classroom: ",i)
+#                class_times[course] = t #I think this should be t+1
+           # else:
+#                print("room not assigned")
+#for i in range(class_num+1):
+#    for j in range(len(roomSchedules)):
+#        if i in roomSchedules[j]:
+#            roomSchedules[j]
+#            class_rooms.append(roomSchedules[j].index(i) + 1)
+#            class_times.append(j+1)
 
 # print(class_rooms)
 # print(class_times)
-
 enrollment = [[] for _ in range (class_num)]
 for p in range(len(student_prefs)):
     studentAvailable = [True] * class_time
 
     for c in student_prefs[p]:
-        capacities[class_rooms[c-1]-1]
-        studentAvailable[class_times[c-1]-1]
-        if len(enrollment[c-1]) < capacities[class_rooms[c-1]-1][1] and studentAvailable[class_times[c-1]-1]:
+        #print("course: ", c-1, ", capacity: ",capacities[class_rooms[c-1]-1],", enrollment: ",len(enrollment[c-1]))
+        #studentAvailable[class_times[c-1]-1]
+        #if len(enrollment[c-1]) < capacities[class_rooms[c-1]-1][1] and studentAvailable[class_times[c-1]-1]:
+        if len(enrollment[c-1]) < class_cap[c-1] and studentAvailable[class_times[c-1]-1]:
             enrollment[c-1].append(p+1)
             studentAvailable[class_times[c-1]-1] = False
-
+        #elif len(enrollment[c-1]) >= capacities[class_rooms[c-1]-1][1]:
+            #print("not enrolled, class ",c," at capacity")
 # print(enrollment)
+for c in range(class_num):
+    print(class_rooms[c])
+    print("course: ",c+1, " room: ",class_rooms[c]," cap: ", class_cap[c]," enr: ", len(enrollment[c]))
 output_file = open("schedule.txt", "w")
 output_file.write("Course\tRoom\tTeacher\tTime\tStudents\n")
-for c in range(class_num):
+for c in range(1,class_num+1):
     student_list = ""
-    for s in enrollment[c]:
+    for s in enrollment[c-1]:
         new_student = str(s)+" "
         student_list += new_student
-    output_file.write(str(c+1) + "\t" + str(class_rooms[c]) + "\t" + str(teacher_class[c]) + "\t" + str(class_times[c]) + "\t" + student_list + "\n")
+    output_file.write(str(c) + "\t" + str(class_rooms[c-1]) + "\t" + str(teacher_class[c-1]) + "\t" + str(class_times[c-1]) + "\t" + student_list + "\n")
 
 output_file.close()
 print("complete.")
