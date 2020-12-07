@@ -158,9 +158,9 @@ for p in range(len(student_prefs)):
         #elif len(enrollment[c-1]) >= capacities[class_rooms[c-1]-1][1]:
             #print("not enrolled, class ",c," at capacity")
 # print(enrollment)
-for c in range(class_num):
-    print(class_rooms[c])
-    print("course: ",c+1, " room: ",class_rooms[c]," cap: ", class_cap[c]," enr: ", len(enrollment[c]))
+#for c in range(class_num):
+    #print(class_rooms[c])
+    #print("course: ",c+1, " room: ",class_rooms[c]," cap: ", class_cap[c]," enr: ", len(enrollment[c]))
 output_file = open("schedule.txt", "w")
 output_file.write("Course\tRoom\tTeacher\tTime\tStudents\n")
 for c in range(1,class_num+1):
