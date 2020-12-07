@@ -1,5 +1,6 @@
 import math
 
+<<<<<<< HEAD
 capacities = [] # capacities of rooms. e.g: room at index 0 has capacity 84
 teacher_class = [] # the class number that each teacher teaches. e.g: teacher at index 0 teaches class no.5
 
